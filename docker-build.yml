@@ -1,0 +1,37 @@
+---
+- name: Build Docker Image
+  hosts: docker_host
+  become: yes
+
+  vars:
+    docker_image_tags:
+      - "{{ build_number_tag }}"
+      - "latest"
+
+  tasks:
+    - name: Install Docker package
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Install git package
+      yum:
+        name: git
+        state: present
+
+    - name: Clone repository
+      git:
+        repo: "https://github.com/M95kandan/end-to-end-CI-CD.git"
+        dest: "/home/ec2-user/end-to-end-CI-CD"
+        clone: yes
+
+
+    - name: Build and tag Docker image
+      shell: docker buildx build --ulimit nofile=1024000:1024000 -t {{ dockerhub_repository }}:{{ item }} /home/ec2-user/end-to-end-CI-CD
+      become: yes
+      loop: "{{ docker_image_tags }}"

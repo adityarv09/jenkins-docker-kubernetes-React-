@@ -1,0 +1,17 @@
+- name: Apply Deployment and Service Files on Kubernetes Master
+  hosts: k8s_master
+  become: yes
+  tasks:
+    - name: Copy deployment-file.yaml to Kubernetes Master
+      copy:
+        src: "./deployment.yml"
+        dest: "/home/ec2-user/deployment.yml"
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: '0644'
+
+    - name: Apply deployment-file.yaml
+      command: kubectl apply -f /home/ec2-user/deployment.yml
+
+    - name: Trigger rolling update
+      command: kubectl rollout restart deployment/website-deployment

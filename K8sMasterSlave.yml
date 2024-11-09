@@ -1,0 +1,234 @@
+---
+- name: Setup Kubernetes Master
+  hosts: k8s_master
+  become: yes
+  tasks:
+    - name: Disable swap
+      command: swapoff -a
+
+    - name: Install iproute-tc package
+      yum:
+        name: iproute-tc
+        state: present
+
+    - name: Load kernel modules
+      modprobe:
+        name: "{{ item }}"
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: Configure kernel modules to load on boot
+      copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { content: "overlay\nbr_netfilter\n", dest: "/etc/modules-load.d/k8s.conf" }
+
+    - name: Configure sysctl settings
+      copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { content: "net.bridge.bridge-nf-call-iptables = 1\nnet.ipv4.ip_forward = 1\nnet.bridge.bridge-nf-call-ip6tables = 1\n", dest: "/etc/sysctl.d/k8s.conf" }
+
+    - name: Apply sysctl settings
+      command: sysctl --system
+
+    - name: Disable SELinux
+      command: "{{ item }}"
+      loop:
+        - setenforce 0
+        - sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+      ignore_errors: yes
+
+    - name: Add Kubernetes repository
+      copy:
+        content: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key
+          exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+        dest: /etc/yum.repos.d/kubernetes.repo
+
+    - name: Download kubelet, kubeadm, and kubectl packages
+      yum:
+        name: "{{ item }}"
+        state: present
+        disable_excludes: kubernetes
+      loop:
+        - kubelet
+        - kubeadm
+        - kubectl
+
+    - name: Enable and start kubelet service
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Initialize Kubernetes cluster
+      command: kubeadm init --pod-network-cidr=192.168.0.0/16
+      ignore_errors: yes
+    - name: Create .kube directory
+      file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+        mode: '0755'
+
+    - name: Copy kubeconfig to user's home directory
+      command: cp -i /etc/kubernetes/admin.conf "{{ ansible_env.HOME }}/.kube/config"
+      args:
+        creates: "{{ ansible_env.HOME }}/.kube/config"
+
+    - name: Set correct ownership for kubeconfig
+      file:
+        path: "{{ ansible_env.HOME }}/.kube/config"
+        owner: "{{ ansible_env.USER }}"
+        group: "{{ ansible_env.USER }}"
+        mode: '0644'
+
+    - name: Untaint control plane node
+      command: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+      ignore_errors: yes
+    - name: Copy Calico YAML to Kubernetes Master
+      copy:
+        src: "./calico.yaml"
+        dest: "/home/ec2-user/calico.yaml"
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: '0644'
+
+    - name: Apply Calico manifest
+      command: kubectl apply -f calico.yaml
+
+    - name: Generate Kubernetes join script
+      command: kubeadm token create --print-join-command
+      register: join_command_output
+
+    - name: Create bash script file for joining nodes
+      copy:
+        content: |
+          #!/bin/bash
+          {{ join_command_output.stdout }}
+        dest: ./k8s_join_script.sh
+        mode: "0755"
+
+    - name: Fetch join command file to Ansible controller node
+      fetch:
+        src: "./k8s_join_script.sh"
+        dest: "./k8s_join_script.sh"
+        flat: yes
+      vars:
+        mode: '0755'  # Set the executable permission
+
+- name: Setup Kubernetes Nodes
+  hosts: k8s_nodes
+  become: yes
+  tasks:
+    - name: Disable swap
+      command: swapoff -a
+
+    - name: Install iproute-tc package
+      yum:
+        name: iproute-tc
+        state: present
+
+    - name: Load kernel modules
+      modprobe:
+        name: "{{ item }}"
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: Configure kernel modules to load on boot
+      copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { content: "overlay\nbr_netfilter\n", dest: "/etc/modules-load.d/k8s.conf" }
+
+    - name: Configure sysctl settings
+      copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { content: "net.bridge.bridge-nf-call-iptables = 1\nnet.ipv4.ip_forward = 1\nnet.bridge.bridge-nf-call-ip6tables = 1\n", dest: "/etc/sysctl.d/k8s.conf" }
+
+    - name: Apply sysctl settings
+      command: sysctl --system
+
+    - name: Disable SELinux
+      command: "{{ item }}"
+      loop:
+        - setenforce 0
+        - sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+      ignore_errors: yes
+
+    - name: Add Kubernetes repository
+      copy:
+        content: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key
+          exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+        dest: /etc/yum.repos.d/kubernetes.repo
+
+    - name: Download kubelet, kubeadm, and kubectl packages
+      yum:
+        name: "{{ item }}"
+        state: present
+        disable_excludes: kubernetes
+      loop:
+        - kubelet
+        - kubeadm
+        - kubectl
+
+    - name: Enable and start kubelet service
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Copy join command file to k8s_nodes group
+      copy:
+        src: "./k8s_join_script.sh"
+        dest: "/home/ec2-user/k8s_join_script.sh"
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: '0755'  # Set the executable permission
+      with_items: "{{ groups['k8s_nodes'] }}"  # Loop over all nodes in k8s_nodes group
+
+    - name: Execute join command on worker nodes
+      command: "/home/ec2-user/k8s_join_script.sh"
+      with_items: "{{ groups['k8s_nodes'] }}"
+      ignore_errors: yes  # Ignore errors during join, as some nodes may already be joined
+

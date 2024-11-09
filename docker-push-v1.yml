@@ -1,0 +1,22 @@
+---
+- name: Push Docker Images to Docker Hub
+  hosts: docker_host
+  become: yes
+
+  vars:
+    docker_image_tags:
+      - "{{ build_number_tag }}"
+      - "latest"
+
+  tasks:
+    - name: Log in to Docker Hub
+      docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_password }}"
+
+    - name: Push Docker images to Docker Hub
+      docker_image:
+        name: "{{ dockerhub_repository }}"
+        tag: "{{ item }}"
+        push: yes
+      loop: "{{ docker_image_tags }}"
