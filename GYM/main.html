@@ -6,78 +6,141 @@
   <title>MasterBlaster Gym by Aditya Raushan</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <!-- Custom CSS -->
   <style>
     body {
       background-color: #f8f9fa;
+      font-family: 'Poppins', sans-serif;
     }
 
-    .jumbotron {
-      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/gym_background.jpg') no-repeat center center/cover;
-      background-color: #343a40;
-      color: #ffffff;
-      padding: 100px 25px;
-      text-align: center;
-      margin-bottom: 0;
-    }
-
+    /* Navbar */
     .navbar {
       background-color: #343a40;
-      padding: 15px 0;
+      transition: all 0.3s ease-in-out;
     }
 
     .navbar-brand {
       color: #ffffff;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: bold;
     }
-    .navbar-nav .nav-link:hover {
-  color: #ffcc00;
-  text-decoration: underline;
-}
-
 
     .navbar-nav .nav-link {
       color: #ffffff;
       margin-right: 20px;
+      transition: color 0.3s ease-in-out;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #17a2b8;
+    }
+
+    /* Jumbotron */
+    .jumbotron {
+      background: linear-gradient(135deg, #343a40, #17a2b8);
+      color: #ffffff;
+      padding: 120px 25px;
+      text-align: center;
+      margin-bottom: 0;
+      border-bottom-left-radius: 50px;
+      border-bottom-right-radius: 50px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .jumbotron h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .jumbotron p {
+      font-size: 1.25rem;
+      margin-bottom: 30px;
+    }
+
+    .btn-primary {
+      background-color: #17a2b8;
+      border: none;
+      font-size: 1rem;
+      padding: 12px 25px;
+      border-radius: 30px;
+      transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .btn-primary:hover {
+      background-color: #138496;
+      transform: scale(1.1);
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Cards Section */
+    .container h2 {
+      font-size: 2rem;
+      margin: 40px 0;
+      text-align: center;
     }
 
     .card {
       border: none;
-      margin-bottom: 30px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .card img {
+      max-height: 250px;
+      object-fit: cover;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .card:hover img {
+      transform: scale(1.1);
     }
 
     .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-    .card-body {
-      text-align: center;
-    }
-
-
-    .card img {
-      max-height: 300px;
-      object-fit: cover;
-    }
-
-    .card-title {
-      margin-top: 15px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     }
 
     footer {
       background-color: #343a40;
       color: #ffffff;
-      padding: 20px 0;
+      padding: 30px 0;
       text-align: center;
+      font-size: 0.9rem;
+    }
+
+    footer p {
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    footer a {
+      color: #17a2b8;
+      text-decoration: none;
+      transition: color 0.3s ease-in-out;
+    }
+
+    footer a:hover {
+      color: #138496;
     }
   </style>
 </head>
 <body>
 
   <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
       <a class="navbar-brand" href="#">MasterBlaster Gym</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,8 +167,8 @@
 
   <!-- Jumbotron -->
   <div class="jumbotron">
-    <h1 class="display-4">Welcome to MasterBlaster Gym</h1>
-    <p class="lead">Achieve your fitness goals with our top-notch facilities and expert trainers.</p>
+    <h1>Welcome to MasterBlaster Gym</h1>
+    <p>Achieve your fitness goals with our top-notch facilities and expert trainers.</p>
     <a class="btn btn-primary btn-lg" href="join_us.html" role="button">Get Started</a>
   </div>
 
@@ -118,7 +181,7 @@
           <img src="images/cardio_blast.jpg" class="card-img-top" alt="Class 1">
           <div class="card-body">
             <h5 class="card-title">Cardio Blast</h5>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="card-text">Push your endurance to the limit with our high-intensity cardio workouts.</p>
           </div>
         </div>
       </div>
@@ -127,7 +190,7 @@
           <img src="images/strength_training.jpg" class="card-img-top" alt="Class 2">
           <div class="card-body">
             <h5 class="card-title">Strength Training</h5>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="card-text">Build your strength with our state-of-the-art equipment and training plans.</p>
           </div>
         </div>
       </div>
@@ -136,7 +199,7 @@
           <img src="images/yoga_session.jpg" class="card-img-top" alt="Class 3">
           <div class="card-body">
             <h5 class="card-title">Yoga Sessions</h5>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p class="card-text">Relax, unwind, and improve your flexibility with our calming yoga sessions.</p>
           </div>
         </div>
       </div>
@@ -145,16 +208,11 @@
 
   <!-- Footer -->
   <footer>
-    <div class="container footer-content">
-        <div class="footer-section">
-            <p>&copy; 2024 MasterBlaster Gym</p>
-        </div>
-        <div class="footer-section">
-            <p>Opening Times</p>
-            <p>Monday - Thursday: 08:00 — 22:00</p>
-            <p>Friday - Saturday: 09:00 — 23:00</p>
-            <p>Sunday: 10:00 — 17:00</p>
-        </div>
+    <div class="container">
+      <p>&copy; 2024 MasterBlaster Gym</p>
+      <p>Opening Times: Mon-Thu: 08:00-22:00 | Fri-Sat: 09:00-23:00 | Sun: 10:00-17:00</p>
+      <p>Follow us on <a href="#">Instagram</a> | <a href="#">Facebook</a></p>
     </div>
+  </footer>
 </body>
 </html>

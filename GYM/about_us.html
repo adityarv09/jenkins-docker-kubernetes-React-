@@ -8,45 +8,127 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <!-- Custom CSS -->
     <style>
+        /* Global Styles */
         body {
             background-color: #f8f9fa;
             color: #495057;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
         }
-
-        .container {
-            margin-top: 100px;
-        }
-
+    
         h1, h2, h3 {
             color: #343a40;
+            font-weight: bold;
+            text-align: center;
         }
-
+    
+        /* Navbar Styles */
+        .navbar {
+            background-color: #343a40;
+            padding: 10px 15px;
+        }
+    
+        .navbar-brand, .navbar-nav a {
+            color: #ffffff !important;
+            transition: color 0.3s ease;
+        }
+    
+        .navbar-nav a:hover {
+            color: #17a2b8 !important;
+        }
+    
+        /* Container Spacing */
+        .container {
+            margin-top: 80px;
+        }
+    
+        /* Section Styles */
         .mission-section, .philosophy-section, .sets-apart-section, .photo-gallery {
-            margin-bottom: 30px;
+            margin-bottom: 50px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-
+    
+        .mission-section:hover, 
+        .philosophy-section:hover, 
+        .sets-apart-section:hover, 
+        .photo-gallery:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+    
+        /* List Styles */
+        .sets-apart-section ul {
+            padding-left: 20px;
+            list-style-type: none;
+        }
+    
+        .sets-apart-section ul li {
+            margin-bottom: 10px;
+        }
+    
+        .sets-apart-section ul li strong {
+            color: #17a2b8;
+        }
+    
+        /* Photo Gallery Styles */
         .photo-gallery img {
             max-width: 100%;
             height: auto;
             margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
         }
-
+    
+        .photo-gallery img:hover {
+            transform: scale(1.05);
+        }
+    
+        /* Footer Styles */
         footer {
             background-color: #343a40;
             color: #ffffff;
             text-align: center;
             padding: 20px 0;
+            margin-top: 30px;
+            font-size: 0.9rem;
         }
-        
-        /* Navbar Styles */
-        .navbar {
-            background-color: #343a40;
+    
+        footer p {
+            margin-bottom: 5px;
         }
-
-        .navbar-brand, .navbar-nav a {
-            color: #ffffff !important;
+    
+        footer p:first-child {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    
+        /* Button Styling */
+        a.nav-link {
+            font-weight: 500;
+        }
+    
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    
+        .container h1, .container h2, .container h3 {
+            animation: fadeIn 1.5s ease;
         }
     </style>
+    
 </head>
 <body>
 
